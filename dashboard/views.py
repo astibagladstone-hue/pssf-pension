@@ -5,7 +5,6 @@ import csv
 import json
 from datetime import date, timedelta
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Sum, Q, F, Value, Avg
 from django.db.models.functions import TruncMonth, TruncYear, Coalesce
@@ -25,7 +24,7 @@ def _months_ago(n):
         year -= 1
     return date(year, month, 1)
 
-@login_required
+
 def home(request):
     ctx = {
         'active_members': Member.objects.filter(status='ACTIVE').count(),
@@ -43,7 +42,7 @@ def home(request):
 
 
 
-@login_required
+
 def enrollment_dashboard(request):
     """Enrollment dashboard view."""
     ctx = {
@@ -53,7 +52,7 @@ def enrollment_dashboard(request):
     }
     return render(request, 'dashboard/enrollment.html', ctx)
 
-@login_required
+
 def members_dashboard(request):
     status_filter = request.GET.get('status', '')
     scheme_filter = request.GET.get('scheme', '')
@@ -79,7 +78,7 @@ def members_dashboard(request):
     }
     return render(request, 'dashboard/members.html', ctx)
 
-@login_required
+
 def members_export(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="members.csv"'
@@ -89,7 +88,7 @@ def members_export(request):
         writer.writerow([m.member_number, m.first_name, m.last_name, m.date_of_birth, m.national_id, m.scheme.name, m.join_date, m.status, m.employer, m.email])
     return response
 
-@login_required
+
 def contributions_dashboard(request):
     year = int(request.GET.get('year', date.today().year))
     receipts = ContributionReceipt.objects.filter(receipt_date__year=year).order_by('-receipt_date')
@@ -112,7 +111,7 @@ def contributions_dashboard(request):
     }
     return render(request, 'dashboard/contributions.html', ctx)
 
-@login_required
+
 def contributions_export(request):
     year = request.GET.get('year', date.today().year)
     response = HttpResponse(content_type='text/csv')
@@ -123,7 +122,7 @@ def contributions_export(request):
         writer.writerow([r.receipt_no, r.receipt_type, r.receipt_date, r.description, r.receipt_amount, r.allocated_amount, r.unallocated_amount])
     return response
 
-@login_required
+
 def interest_dashboard(request):
     year = int(request.GET.get('year', date.today().year - 1))
     records = MemberInterest.objects.filter(year=year).select_related('member')
@@ -132,7 +131,7 @@ def interest_dashboard(request):
     ctx = {'year': year, 'years': range(date.today().year - 1, date.today().year - 8, -1), 'totals': totals, 'top_earners': top_earners, 'record_count': records.count()}
     return render(request, 'dashboard/interest.html', ctx)
 
-@login_required
+
 def withdrawals_dashboard(request):
     status_filter = request.GET.get('status', '')
     qs = WithdrawalApplication.objects.select_related('member')
@@ -149,7 +148,7 @@ def withdrawals_dashboard(request):
     }
     return render(request, 'dashboard/withdrawals.html', ctx)
 
-@login_required
+
 def claims_dashboard(request):
     status_filter = request.GET.get('status', '')
     qs = ClaimApplication.objects.select_related('member')
@@ -160,7 +159,7 @@ def claims_dashboard(request):
     ctx = {'claims': qs[:100], 'by_status': by_status, 'by_status_json': json.dumps(by_status), 'totals': totals, 'current_status': status_filter}
     return render(request, 'dashboard/claims.html', ctx)
 
-@login_required
+
 def trust_fund_dashboard(request):
     accounts = TrustFundAccount.objects.all()
     total_fund = accounts.aggregate(s=Coalesce(Sum('current_balance'), Value(0)))['s']
@@ -168,7 +167,7 @@ def trust_fund_dashboard(request):
     ctx = {'accounts': accounts, 'total_fund': total_fund, 'recent_transactions': recent_transactions}
     return render(request, 'dashboard/trust_fund.html', ctx)
 
-@login_required
+
 def income_drawdown_dashboard(request):
     plans = IncomeDrawdownPlan.objects.select_related('member').all()
     active_plans = plans.filter(status='ACTIVE')
@@ -179,7 +178,7 @@ def income_drawdown_dashboard(request):
     ctx = {'plans': plans[:100], 'active_count': active_plans.count(), 'total_fund_under_drawdown': total_fund_under_drawdown, 'monthly_obligations': monthly_obligations, 'recent_payments': recent_payments, 'payment_totals': payment_totals}
     return render(request, 'dashboard/income_drawdown.html', ctx)
 
-@login_required
+
 def pensioners_payroll_dashboard(request):
     runs = PensionPayrollRun.objects.order_by('-run_date')[:24]
     latest_run = runs.first()
@@ -188,7 +187,7 @@ def pensioners_payroll_dashboard(request):
     ctx = {'payroll_runs': runs, 'latest_run': latest_run, 'active_pensioners': pensioners.count(), 'total_monthly': total_monthly}
     return render(request, 'dashboard/pensioners_payroll.html', ctx)
 
-@login_required
+
 def crm_dashboard(request):
     status_filter = request.GET.get('status', '')
     qs = Ticket.objects.all()
@@ -201,38 +200,38 @@ def crm_dashboard(request):
     return render(request, 'dashboard/crm.html', ctx)
 
 # API Views
-@login_required
+
 def api_contributions_monthly(request):
     data = list(ContributionReceipt.objects.filter(receipt_date__gte=_months_ago(12)).annotate(month=TruncMonth('receipt_date')).values('month').annotate(total=Sum('receipt_amount'), count=Count('id')).order_by('month'))
     return JsonResponse([{'month': str(r['month'])[:7], 'total': float(r['total']), 'count': r['count']} for r in data], safe=False)
 
-@login_required
+
 def api_members_status(request):
     data = {r['status']: r['count'] for r in Member.objects.values('status').annotate(count=Count('id'))}
     return JsonResponse(data)
 
-@login_required
+
 def api_claims_status(request):
     data = {r['status']: r['count'] for r in ClaimApplication.objects.values('status').annotate(count=Count('id'))}
     return JsonResponse(data)
 
-@login_required
+
 def api_trust_fund_trend(request):
     data = list(TrustFundTransaction.objects.filter(transaction_date__gte=_months_ago(12)).annotate(month=TruncMonth('transaction_date')).values('month').annotate(total=Sum('amount')).order_by('month'))
     return JsonResponse([{'month': str(r['month'])[:7], 'total': float(r['total'])} for r in data], safe=False)
 
-@login_required
+
 def api_withdrawals_monthly(request):
     data = list(WithdrawalApplication.objects.filter(application_date__gte=_months_ago(12)).annotate(month=TruncMonth('application_date')).values('month').annotate(count=Count('id'), total=Sum('net_benefit')).order_by('month'))
     return JsonResponse([{'month': str(r['month'])[:7], 'count': r['count'], 'total': float(r['total'] or 0)} for r in data], safe=False)
 
-@login_required
+
 def api_payroll_monthly(request):
     data = list(PensionPayrollRun.objects.order_by('-run_date').values('run_date', 'period_month', 'period_year', 'total_pensioners', 'gross_payroll', 'net_payroll')[:12])
     return JsonResponse(data, safe=False)
 
 
-@login_required
+
 def executive_dashboard(request):
     ctx = {
         'member_total': Member.objects.count(),
@@ -245,28 +244,28 @@ def executive_dashboard(request):
     return render(request, 'dashboard/executive_dashboard.html', ctx)
 
 # ================= V8 Production Operations =================
-@login_required
+
 def claims_approval(request):
     claims = ClaimApplication.objects.all().order_by('-id')[:100]
     return render(request, 'dashboard/v8_claims_approval.html', {'claims': claims})
 
-@login_required
+
 def withdrawals_approval(request):
     withdrawals = WithdrawalApplication.objects.all().order_by('-id')[:100]
     return render(request, 'dashboard/v8_withdrawals_approval.html', {'withdrawals': withdrawals})
 
-@login_required
+
 def payment_processing(request):
     return render(request, 'dashboard/v8_payment_processing.html')
 
-@login_required
+
 def reporting_centre(request):
     return render(request, 'dashboard/v8_reporting_centre.html')
 
-@login_required
+
 def member_statement(request):
     return render(request, 'dashboard/v8_member_statement.html')
 
-@login_required
+
 def audit_history(request):
     return render(request, 'dashboard/v8_audit_history.html')
