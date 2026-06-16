@@ -41,6 +41,18 @@ def home(request):
     }
     return render(request, 'dashboard/home.html', ctx)
 
+
+
+@login_required
+def enrollment_dashboard(request):
+    """Enrollment dashboard view."""
+    ctx = {
+        'members': Member.objects.count(),
+        'active_members': Member.objects.filter(status='ACTIVE').count(),
+        'schemes': Scheme.objects.all(),
+    }
+    return render(request, 'dashboard/enrollment.html', ctx)
+
 @login_required
 def members_dashboard(request):
     status_filter = request.GET.get('status', '')
