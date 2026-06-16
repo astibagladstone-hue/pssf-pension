@@ -1,0 +1,7 @@
+Change these lines in settings.py:
+
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+This disables the login redirect for dashboard preview.
