@@ -1,0 +1,8 @@
+:root{--pssf-navy:#344669;--pssf-gold:#B87B0E;--pssf-green:#2DA581;--pssf-black:#231F20}
+body{font-family:Avenir,Arial,sans-serif;background:#f5f7fb;color:var(--pssf-black)}
+.sidebar,.navbar{background:var(--pssf-navy)!important;color:white}
+.card{border-radius:14px;border:none;box-shadow:0 4px 18px rgba(0,0,0,.08)}
+.kpi-card{border-left:5px solid var(--pssf-gold)}
+.btn-primary{background:var(--pssf-navy);border-color:var(--pssf-navy)}
+.success{color:var(--pssf-green)}
+.brand-title{color:var(--pssf-gold);font-weight:700}

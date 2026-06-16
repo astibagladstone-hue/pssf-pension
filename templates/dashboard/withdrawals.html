@@ -1,0 +1,25 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Withdrawals — PSSF{% endblock %}
+{% block page_title %}Withdrawals{% endblock %}
+{% block content %}
+<div class="section-title">Withdrawals</div>
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-label">Total Records</div><div class="kpi-value">0</div></div>
+  <div class="kpi teal-light"><div class="kpi-label">Active</div><div class="kpi-value">0</div></div>
+  <div class="kpi amber"><div class="kpi-label">Pending</div><div class="kpi-value">0</div></div>
+</div>
+<div class="charts-grid">
+  <div class="chart-card wide"><div class="chart-title">Overview</div><div class="chart-wrap"><canvas id="overviewChart"></canvas></div></div>
+</div>
+<div class="table-card">
+  <div class="table-header"><h3>Records</h3></div>
+  <table><thead><tr><th>ID</th><th>Description</th><th>Status</th></tr></thead>
+    <tbody><tr><td colspan="3" style="text-align:center;padding:24px;color:var(--muted);">No records found.</td></tr></tbody>
+  </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+new Chart(document.getElementById('overviewChart'),{ type:'bar', data:{ labels:['Sample'], datasets:[{ data:[0], backgroundColor:'#00838f' }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } } });
+</script>
+{% endblock %}

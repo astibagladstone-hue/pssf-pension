@@ -1,0 +1,46 @@
+{% extends "dashboard/base.html" %}
+{% block title %}CRM — PSSF{% endblock %}
+{% block page_title %}CRM Activities{% endblock %}
+{% block content %}
+<div class="section-title">Assigned Tickets</div>
+<div class="kpi-grid">
+  <div class="kpi"><div class="kpi-label">All</div><div class="kpi-value">{{ status_counts.values|sum|default:0 }}</div></div>
+  <div class="kpi teal-light"><div class="kpi-label">New</div><div class="kpi-value">{{ status_counts.NEW|default:0 }}</div></div>
+  <div class="kpi teal-light"><div class="kpi-label">Open</div><div class="kpi-value">{{ status_counts.OPEN|default:0 }}</div></div>
+  <div class="kpi"><div class="kpi-label">In Progress</div><div class="kpi-value">{{ status_counts.IN_PROGRESS|default:0 }}</div></div>
+  <div class="kpi amber"><div class="kpi-label">Escalated</div><div class="kpi-value">{{ status_counts.ESCALATED|default:0 }}</div></div>
+  <div class="kpi"><div class="kpi-label">Closed</div><div class="kpi-value">{{ status_counts.CLOSED|default:0 }}</div></div>
+  <div class="kpi"><div class="kpi-label">Archived</div><div class="kpi-value">{{ status_counts.ARCHIVED|default:0 }}</div></div>
+</div>
+<div class="kpi-grid">
+  <div class="kpi red"><div class="kpi-label">Overdue Tickets (All)</div><div class="kpi-value">{{ overdue_count }}</div></div>
+  <div class="kpi red"><div class="kpi-label">Unassigned</div><div class="kpi-value">{{ unassigned_count }}</div></div>
+</div>
+<div class="filters">
+  <form method="get" style="display:flex;gap:10px;">
+    <select name="status">
+      <option value="">All Statuses</option>
+      <option value="NEW" {% if current_status == 'NEW' %}selected{% endif %}>New</option>
+      <option value="OPEN" {% if current_status == 'OPEN' %}selected{% endif %}>Open</option>
+      <option value="IN_PROGRESS" {% if current_status == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+      <option value="ESCALATED" {% if current_status == 'ESCALATED' %}selected{% endif %}>Escalated</option>
+      <option value="CLOSED" {% if current_status == 'CLOSED' %}selected{% endif %}>Closed</option>
+      <option value="ARCHIVED" {% if current_status == 'ARCHIVED' %}selected{% endif %}>Archived</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+  </form>
+</div>
+<div class="table-card">
+  <div class="table-header"><h3>Tickets</h3></div>
+  <table><thead><tr><th>Ticket #</th><th>Subject</th><th>Member</th><th>Status</th><th>Priority</th><th>Assigned To</th><th>Due Date</th></tr></thead>
+    <tbody>{% for t in tickets %}<tr><td>{{ t.ticket_number }}</td><td>{{ t.subject }}</td><td>{{ t.member|default:"—" }}</td><td><span class="badge badge-{% if t.status == 'CLOSED' or t.status == 'ARCHIVED' %}inactive{% elif t.status == 'ESCALATED' %}escalated{% elif t.status == 'IN_PROGRESS' %}inprogress{% elif t.status == 'NEW' %}pending{% else %}active{% endif %}">{{ t.status }}</span></td><td>{{ t.priority }}</td><td>{{ t.assigned_to|default:"Unassigned" }}</td><td>{% if t.is_overdue %}<span style="color:var(--red)">⚠ {% endif %}{{ t.due_date|default:"—" }}</td></tr>{% empty %}<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">No tickets found.</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const sc={{ status_counts_json|safe }};
+const C=['#00838f','#00acc1','#2e7d32','#f9a825','#c62828','#78909c','#546e7a'];
+new Chart(document.getElementById('statusPie'),{type:'doughnut',data:{labels:Object.keys(sc),datasets:[{data:Object.values(sc),backgroundColor:C}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right'}}}});
+</script>
+{% endblock %}

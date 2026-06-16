@@ -1,0 +1,1 @@
+{% extends 'dashboard/base.html' %}{% block content %}<h2>Claims Approval Workflow</h2><table><tr><th>Claim</th><th>Status</th></tr>{% for c in claims %}<tr><td>{{c}}</td><td>{{c.status}}</td></tr>{% empty %}<tr><td>No claims</td></tr>{% endfor %}</table>{% endblock %}

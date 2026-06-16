@@ -1,0 +1,1 @@
+{% extends 'dashboard/base.html' %}{% block content %}<h2>Withdrawal Approval Workflow</h2>{% for w in withdrawals %}<p>{{w}} - {{w.status}}</p>{% empty %}<p>No withdrawals</p>{% endfor %}{% endblock %}

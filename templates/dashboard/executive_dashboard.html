@@ -1,0 +1,22 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Executive Reports{% endblock %}
+{% block page_title %}Executive Pension Reports{% endblock %}
+{% block content %}
+<div class="kpi-grid">
+<div class="kpi"><div class="kpi-label">Members</div><div class="kpi-value">{{member_total}}</div></div>
+<div class="kpi green"><div class="kpi-label">Active Members</div><div class="kpi-value">{{active_members}}</div></div>
+<div class="kpi"><div class="kpi-label">Receipts</div><div class="kpi-value">{{receipt_total}}</div></div>
+<div class="kpi amber"><div class="kpi-label">Claims</div><div class="kpi-value">{{claims_total}}</div></div>
+<div class="kpi red"><div class="kpi-label">Withdrawals</div><div class="kpi-value">{{withdrawals_total}}</div></div>
+</div>
+<div class="chart-card"><div class="chart-title">Portfolio Overview</div><div class="chart-wrap"><canvas id="reportChart"></canvas></div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+new Chart(document.getElementById('reportChart'),{
+type:'bar',
+data:{labels:['Members','Claims','Withdrawals','Pensioners'],datasets:[{label:'Total',data:[{{member_total}},{{claims_total}},{{withdrawals_total}},{{pensioners_total}}]}]},
+options:{responsive:true,maintainAspectRatio:false}
+});
+</script>
+{% endblock %}
