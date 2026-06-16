@@ -1,0 +1,24 @@
+Open dashboard/views.py
+
+Remove this line if it exists:
+
+from django.contrib.auth.decorators import login_required
+
+
+Remove all lines:
+
+@login_required
+
+
+Example:
+
+CHANGE:
+
+@login_required
+def home(request):
+
+TO:
+
+def home(request):
+
+Keep the rest of your existing views.py code.

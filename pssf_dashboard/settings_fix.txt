@@ -1,0 +1,7 @@
+Open pssf_dashboard/settings.py
+
+For preview mode keep:
+
+DEBUG = False
+
+This hides Django debug pages in production.

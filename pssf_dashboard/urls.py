@@ -1,16 +1,18 @@
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 
-    # Temporary dashboard preview - bypass login
     path(
-        'login/',
-        RedirectView.as_view(url='/'),
-        name='login'
+        "login/",
+        auth_views.LoginView.as_view(
+            template_name="dashboard/login.html"
+        ),
+        name="login",
     ),
 
-    path('', include('dashboard.urls')),
+    path("", include("dashboard.urls")),
 ]
