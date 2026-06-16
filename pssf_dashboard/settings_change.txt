@@ -1,0 +1,7 @@
+In pssf_dashboard/settings.py change:
+
+DEBUG = True
+
+to:
+
+DEBUG = False

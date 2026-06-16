@@ -1,0 +1,9 @@
+In dashboard/views.py:
+
+Remove:
+from django.contrib.auth.decorators import login_required
+
+Remove every line:
+@login_required
+
+Leave the rest of your views unchanged.
